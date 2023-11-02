@@ -70,10 +70,35 @@ class DigitalTimer extends Component {
     }))
   }
 
+<<<<<<< HEAD
   decreasetime = () => {
     this.setState(prevState => ({
       tes: prevState.tes - 60,
     }))
+=======
+  startTime = () => {
+     this.updateIsStarted()
+    const {min, sec} = this.state
+    let totalSeconds = min * 60 + sec
+    this.timerId = setInterval(() => {
+      if (totalSeconds === 0) {
+        this.clearTimeInterval()
+        return
+      }
+      totalSeconds -= 1
+      const updateMin = Math.floor(totalSeconds / 60)
+      const updateSec = totalSeconds % 60
+      this.setState({
+        min: updateMin,
+        sec: updateSec,
+      })
+    }, 1000)
+  }
+
+  resetTimer = () => {
+    this.clearTimeInterval()
+    this.setState({min: 25, sec: 0})
+>>>>>>> origin/main
   }
 
   // updated code
