@@ -5,89 +5,83 @@ import './index.css'
 
 class DigitalTimer extends Component {
   state = {
-    min: 25,
-    sec: 0,
+    tes: 1500,
     isStarted: false,
   }
 
+  updateIsStarted = () => {
+    this.setState({isStarted: true})
+  }
+
   clearTimeInterval = () => {
+    console.log('clearTimeInterval called')
     clearInterval(this.timerId)
     this.setState({isStarted: false})
   }
 
-  updateIsStarted = () => {
-    this.setState(prevState => ({
-      isStarted: !prevState.isStarted,
-    }))
-  }
-
-  getMinutes = min => {
+  getMinutes = () => {
+    const {tes} = this.state
+    const min = Math.floor(tes / 60)
     if (min < 10) {
-      return '0'.concat(min)
+      return `0${min}`
     }
     return min
   }
 
-  decreaseTimeLimt = () => {
-    this.setState(prevState => ({
-      min: prevState.min - 1,
-    }))
-  }
-
-  inccreaseTimeLimt = () => {
-    this.setState(prevState => ({
-      min: prevState.min + 1,
-    }))
-  }
-
-  getSeconds = sec => {
+  getSeconds = () => {
+    const {tes} = this.state
+    const sec = Math.floor(tes % 60)
     if (sec < 10) {
-      return '0'.concat(sec)
+      return `0${sec}`
     }
     return sec
   }
 
-  updateSeconds = () => {
+  updateTime = () => {
+    const {tes} = this.state
+    if (tes === 0) {
+      this.clearTimeInterval()
+      return
+    }
+    console.log('onStartTimer - updateTime- called')
     this.setState(prevState => ({
-      sec: prevState.sec - 1,
+      tes: prevState.tes - 1,
     }))
   }
 
-  updateminutetoseconds = () => {
-    this.setState(prevState => ({
-      sec: 60,
-      min: prevState.min - 1,
-    }))
-  }
-
-  startTime = () => {
+  onStartTimer = () => {
     this.updateIsStarted()
-    const {min, sec} = this.state
-    let count = 0
-    this.timerId = setInterval(() => {
-      count += 1
-      if (min === 0 && sec === 0) {
-        this.clearTimeInterval()
-      }
-      if (count === 60) {
-        this.updateminutetoseconds()
-        count = 0
-      }
-      this.updateSeconds()
-      console.log(count)
-    }, 100)
+    console.log('onStartTimer called')
+    this.timerId = setInterval(this.updateTime, 1000)
   }
 
-  resetTimer = () => {
-    this.clearTimeInterval()
-    this.setState({min: 25, sec: 0})
+  onreset = () => {
+    console.log('onreset called')
+    this.clearTimeInterval(this.timerId)
+    this.setState({
+      isStarted: false,
+      tes: 1500,
+    })
   }
 
+  increasetime = () => {
+    this.setState(prevState => ({
+      tes: prevState.tes + 60,
+    }))
+  }
+
+  decreasetime = () => {
+    this.setState(prevState => ({
+      tes: prevState.tes - 60,
+    }))
+  }
+
+  // updated code
   render() {
-    const {min, sec, isStarted} = this.state
+    const {isStarted} = this.state
 
-    const minutes = this.getMinutes(min)
-    const seconds = this.getSeconds(sec)
+    const minutes = this.getMinutes()
+    const seconds = this.getSeconds()
     const url = isStarted
       ? 'https://assets.ccbp.in/frontend/react-js/pause-icon-img.png'
       : 'https://assets.ccbp.in/frontend/react-js/play-icon-img.png'
@@ -101,7 +95,7 @@ class DigitalTimer extends Component {
               <h1 className="timer">
                 {minutes}:{seconds}
               </h1>
-              <p>Paused</p>
+              <p>{isStarted ? 'Running' : 'Paused'}</p>
             </div>
           </div>
           <div className="cont-2">
@@ -109,8 +103,10 @@ class DigitalTimer extends Component {
               <div className="start-cont">
                 <button
                   type="button"
+                  onClick={
+                    isStarted ? this.clearTimeInterval : this.onStartTimer
+                  }
                   className="but-start"
-                  onClick={isStarted ? this.clearTimeInterval : this.startTime}
                 >
                   <img src={url} alt={alt} className="start-icon" />
                   {isStarted ? 'Pause' : 'Start'}
@@ -119,8 +115,8 @@ class DigitalTimer extends Component {
               <div className="start-cont">
                 <button
                   type="button"
+                  onClick={this.onreset}
                   className="but-start"
-                  onClick={this.resetTimer}
                 >
                   <img
                     src="https://assets.ccbp.in/frontend/react-js/reset-icon-img.png"
@@ -136,8 +132,8 @@ class DigitalTimer extends Component {
               <button
                 className=""
                 type="button"
+                onClick={this.decreasetime}
                 disabled={isStarted}
-                onClick={this.decreaseTimeLimt}
               >
                 -
               </button>
@@ -145,8 +141,8 @@ class DigitalTimer extends Component {
               <button
                 className=""
                 type="button"
+                onClick={this.increasetime}
                 disabled={isStarted}
-                onClick={this.inccreaseTimeLimt}
               >
                 +
               </button>
